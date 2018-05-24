@@ -10,6 +10,12 @@ const fs = require('fs');
 const del = require('del');
 const rollup = require('rollup');
 const babel = require('rollup-plugin-babel');
+const postcss = require('rollup-plugin-postcss');
+// PostCSS plugins
+const simplevars = require('postcss-simple-vars');
+const nested = require('postcss-nested');
+const cssnext = require('postcss-cssnext');
+const cssnano = require('cssnano');
 const pkg = require('../package.json');
 
 let promise = Promise.resolve();
@@ -22,16 +28,24 @@ promise = promise.then(() => del(['dist/*']));
     promise = promise.then(() => rollup.rollup({
         input: 'src/index.js',
         external: Object.keys(pkg.dependencies),
-        plugins: [babel(Object.assign({
+        plugins: [postcss({
+            plugins: [
+                simplevars(),
+                nested(),
+                cssnext({ warnForDuplicates: false, }),
+                cssnano()],
+            extensions: ['.css']
+        }),
+        babel(Object.assign({
             babelrc: false,
             exclude: 'node_modules/**',
             runtimeHelpers: true,
             presets: [[
                 'env',
                 {
-                  'modules': false
+                    'modules': false
                 }
-              ]],
+            ]],
             plugins: [
                 ['transform-react-jsx', {
                     'pragma': 'l'
@@ -55,6 +69,8 @@ promise = promise.then(() => {
     delete pkg.babel;
     fs.writeFileSync('dist/package.json', JSON.stringify(pkg, null, '  '), 'utf-8');
     fs.writeFileSync('dist/LICENSE.txt', fs.readFileSync('LICENSE.txt', 'utf-8'), 'utf-8');
+    fs.writeFileSync('dist/index.html', fs.readFileSync('src/index.html', 'utf-8'), 'utf-8');
+    fs.writeFileSync('dist/index.css', fs.readFileSync('src/index.css', 'utf-8'), 'utf-8');
 });
 
 promise.catch(err => console.error(err.stack)); // eslint-disable-line no-console
