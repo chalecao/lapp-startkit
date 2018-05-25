@@ -15,10 +15,10 @@ const uglify = require('rollup-plugin-uglify').uglify;
 const minify = require('uglify-es').minify;
 const buble = require('rollup-plugin-buble');
 // PostCSS plugins
-const simplevars = require('postcss-simple-vars');
-const nested = require('postcss-nested');
-const cssnext = require('postcss-cssnext');
-const cssnano = require('cssnano');
+const simplevars = require('postcss-simple-vars');  //可以使用Sass风格的变量
+const nested = require('postcss-nested'); //允许使用嵌套规则。
+const cssnext = require('postcss-cssnext'); //这个插件集支持大多数现代CSS语法
+const cssnano = require('cssnano'); //压缩，减小输出CSS文件大小
 const pkg = require('../package.json');
 
 let promise = Promise.resolve();
